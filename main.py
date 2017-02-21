@@ -309,8 +309,53 @@ class Agent:
     def __init__(self):
         self.property_list = []
 
-    def find_property(self):
+    @staticmethod
+    def multiple_input(message, *options):
+        opt = list(options)
+        output = {}
+        print(message)
+        inp = '\n'
+        while not inp == '':
+            for i in opt:
+                print(i)
+            inp = input()
+            if '=' not in inp or inp.count('=') > 1:
+                continue
+            index = inp.find('=')
+            if inp[:index].strip() not in options:
+                continue
+            output.update({inp[:index].strip(): inp[index + 1:].strip()})
+            try:
+                opt.remove(inp[:index].strip())
+            except ValueError:
+                pass
+        return output
 
+    @staticmethod
+    def set_of_dict(dictionary):
+        a = set()
+        for key in dictionary:
+            a.add((key, dictionary[key]))
+        return a
+
+    def find_property(self):
+        kind = get_valid_input('What kind of property do you want to find?', ('apartment', 'house'))
+        action = get_valid_input('Purchase or rental?', ('purchase', 'rental'))
+        PropertyClass = Agent.type_map[(kind, action)]
+        if (kind, action) == ('apartment', 'purchase'):
+            attributes = ['balcony', 'laundry', 'beds', 'baths', 'price', 'taxes', 'square_feet']
+        elif (kind, action) == ('apartment', 'rental'):
+            attributes = ['balcony', 'laundry', 'beds', 'baths', 'furnished', 'utilities', 'rent', 'square_feet']
+        elif (kind, action) == ('house', 'purchase'):
+            attributes = ['fenced', 'garage', 'beds', 'baths', 'price', 'taxes', 'square_feet']
+        else:
+            attributes = ['balcony', 'laundry', 'beds', 'baths', 'furnished', 'utilities', 'rent', 'square_feet']
+        search_request = Agent.multiple_input('Enter search parameters: ', *attributes)
+        for property in self.property_list:
+            if Agent.set_of_dict(property.__dict__()).issuperset(Agent.set_of_dict(search_request)):
+                return property
+        else:
+            print('Not found')
 
     def display_properties(self):
         '''
@@ -332,3 +377,6 @@ class Agent:
         PropertyClass = self.type_map[(property_type, payment_type)]
         init_args = PropertyClass.prompt_init()
         self.property_list.append(PropertyClass(**init_args))
+
+agent = Agent()
+agent.find_property()
