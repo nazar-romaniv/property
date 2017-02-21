@@ -1,9 +1,8 @@
 def get_valid_input(input_string, valid_options):
     '''
     Checks if the passed input matches one of the printed options and returns the input.
-    input_string -- message printed at input
-    valid_options -- the valid options expected by the caller
-
+    :input_string: Message printed at input
+    :valid_options: The valid options expected by the caller
     '''
     input_string += " ({}) ".format(", ".join(valid_options))
     response = input(input_string)
@@ -60,8 +59,8 @@ class Apartment(Property):
 
     def __init__(self, balcony='', laundry='', **kwargs):
         '''
-        :param balcony: Contains the information about the balcony of the apartment ("yes", "no", "solarium").
-        :param laundry: Contains the information about the laundry of the apartment ("coin", "ensuite", "none").
+        :balcony: Contains the information about the balcony of the apartment ("yes", "no", "solarium").
+        :laundry: Contains the information about the laundry of the apartment ("coin", "ensuite", "none").
         '''
         super().__init__(**kwargs)
         self.balcony = balcony
@@ -125,9 +124,9 @@ class House(Property):
 
     def __init__(self, num_stories='', garage='', fenced='', **kwargs):
         '''
-        :param num_stories: Number of stories in the house.
-        :param garage: One of the following: "attached", "detached", "none".
-        :param fenced: Tells whether the house is fenced.
+        :num_stories: Number of stories in the house.
+        :garage: One of the following: "attached", "detached", "none".
+        :fenced: Tells whether the house is fenced.
         '''
         super().__init__(**kwargs)
         self.garage = garage
