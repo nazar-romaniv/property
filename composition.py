@@ -16,14 +16,13 @@ class Property:
     Base class for House and Apartment.
     '''
 
-    def __init__(self, square_feet='', beds='', baths='', **kwargs):
+    def __init__(self, square_feet='', beds='', baths=''):
         '''
         :square_feet: The area of the property.
         :beds: The number of bedrooms.
         :baths: The number of bathrooms.
         :kwargs: Keyword arguments for compatibility with multiple inheritance.
         '''
-        super().__init__(**kwargs)
         self.square_feet = square_feet
         self.num_bedrooms = beds
         self.num_baths = baths
@@ -167,12 +166,11 @@ class Purchase:
     The class to implement the purchase of a property.
     '''
 
-    def __init__(self, price='', taxes='', **kwargs):
+    def __init__(self, price='', taxes=''):
         '''
         :price: The price of the property.
         :taxes: The taxes paid.
         '''
-        super().__init__(**kwargs)
         self.price = price
         self.taxes = taxes
 
@@ -180,7 +178,6 @@ class Purchase:
         '''
         Prints out the information on the purchase.
         '''
-        super().display()
         print("PURCHASE DETAILS")
         print("selling price: {}".format(self.price))
         print("estimated taxes: {}".format(self.taxes))
@@ -205,7 +202,6 @@ class Rental:
         :utilities: The sum of the utilities.
         :rent: The amount of rent.
         '''
-        super().__init__(**kwargs)
         self.furnished = furnished
         self.rent = rent
         self.utilities = utilities
@@ -214,7 +210,6 @@ class Rental:
         '''
         Displays the information on the rented property.
         '''
-        super().display()
         print("RENTAL DETAILS")
         print("rent: {}".format(self.rent))
         print("estimated utilities: {}".format(
@@ -234,10 +229,13 @@ class Rental:
         ("yes", "no")))
 
 
-class HouseRental(Rental, House):
+class HouseRental:
     '''
     Implements the rental of a house.
     '''
+
+    def __init__(self):
+
 
     @staticmethod
     def prompt_init():
@@ -249,7 +247,7 @@ class HouseRental(Rental, House):
         return init
 
 
-class ApartmentRental(Rental, Apartment):
+class ApartmentRental:
     '''
         Implements the rental of an apartment.
         '''
@@ -264,7 +262,7 @@ class ApartmentRental(Rental, Apartment):
         return init
 
 
-class ApartmentPurchase(Purchase, Apartment):
+class ApartmentPurchase:
     '''
     Implements the purchase of an apartment.
     '''
@@ -279,7 +277,7 @@ class ApartmentPurchase(Purchase, Apartment):
         return init
 
 
-class HousePurchase(Purchase, House):
+class HousePurchase:
     '''
     Implements the purchase of a house.
     '''
@@ -375,8 +373,7 @@ class Agent:
          "What payment type? ",
          ("purchase", "rental")).lower()
         PropertyClass = self.type_map[(property_type, payment_type)]
-        init_args = PropertyClass.prompt_init()
-        self.property_list.append(PropertyClass(**init_args))
+        self.property_list.append(PropertyClass())
 
 agent = Agent()
 agent.find_property()
