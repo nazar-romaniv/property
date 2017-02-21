@@ -309,13 +309,15 @@ class Agent:
     def __init__(self):
         self.property_list = []
 
+    def find_property(self):
+
+
     def display_properties(self):
         '''
         Prints out the information on all the properties of the agent.
         '''
         for property in self.property_list:
             property.display()
-
 
     def add_property(self):
         '''
@@ -327,7 +329,6 @@ class Agent:
         payment_type = get_valid_input(
          "What payment type? ",
          ("purchase", "rental")).lower()
-        PropertyClass = self.type_map[
-         (property_type, payment_type)]
+        PropertyClass = self.type_map[(property_type, payment_type)]
         init_args = PropertyClass.prompt_init()
         self.property_list.append(PropertyClass(**init_args))

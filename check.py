@@ -4,6 +4,7 @@ Module for checking the functionality of main.py.
 import main
 import doctest
 
+
 def check_house():
     '''
     >>> check_house()
@@ -26,6 +27,26 @@ def check_house():
     my_house.garage = "none"
     my_house.fenced = "no"
     my_house.display()
+
+
+def check_purchase():
+    '''
+    >>> check_purchase()
+    PURCHASE DETAILS
+    selling price: $100,000
+    estimated taxes: $4,000
+    '''
+    purchase = main.Purchase()
+    purchase.price = "$100,000"
+    purchase.taxes = "$4,000"
+    purchase.display()
+
+
+def check_agent():
+    agent = main.Agent()
+    agent.add_property()
+    agent.display_properties()
+
 
 if __name__ == '__main__':
     doctest.testmod()
