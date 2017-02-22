@@ -44,8 +44,8 @@ class Property:
         Requests for the input of the characteristics of the property.
         '''
         return dict(square_feet=input("Enter the square feet: "),
-                    beds=input("Enter number of bedrooms: "),
-                    baths=input("Enter number of baths: "))
+                    num_bedrooms=input("Enter number of bedrooms: "),
+                    num_baths=input("Enter number of baths: "))
 
 
 class Apartment(Property):
@@ -69,7 +69,7 @@ class Apartment(Property):
         '''
         Displays the information on the apartment.
         '''
-        super().display()
+        Property.display(self)
         print("APARTMENT DETAILS")
         print("laundry: {}".format(self.laundry))
         print("has balcony:".format(self.balcony))
@@ -136,7 +136,7 @@ class House(Property):
         '''
         Displays the information on the house.
         '''
-        super().display()
+        Property.display(self)
         print("HOUSE DETAILS")
         print("# of stories: {}".format(self.num_stories))
         print("garage: {}".format(self.garage))
@@ -235,7 +235,13 @@ class HouseRental:
     '''
 
     def __init__(self):
+        attributes = HouseRental.prompt_init()
+        for attribute in attributes:
+            setattr(self, attribute, attributes[attribute])
 
+    def display(self):
+        House.display(self)
+        Rental.display(self)
 
     @staticmethod
     def prompt_init():
@@ -252,6 +258,15 @@ class ApartmentRental:
         Implements the rental of an apartment.
         '''
 
+    def __init__(self):
+        attributes = ApartmentRental.prompt_init()
+        for attribute in attributes:
+            setattr(self, attribute, attributes[attribute])
+
+    def display(self):
+        Apartment.display(self)
+        Rental.display(self)
+
     @staticmethod
     def prompt_init():
         '''
@@ -267,6 +282,15 @@ class ApartmentPurchase:
     Implements the purchase of an apartment.
     '''
 
+    def __init__(self):
+        attributes = ApartmentPurchase.prompt_init()
+        for attribute in attributes:
+            setattr(self, attribute, attributes[attribute])
+
+    def display(self):
+        Apartment.display(self)
+        Purchase.display(self)
+
     @staticmethod
     def prompt_init():
         '''
@@ -281,6 +305,15 @@ class HousePurchase:
     '''
     Implements the purchase of a house.
     '''
+
+    def __init__(self):
+        attributes = HousePurchase.prompt_init()
+        for attribute in attributes:
+            setattr(self, attribute, attributes[attribute])
+
+    def display(self):
+        House.display(self)
+        Purchase.display(self)
 
     @staticmethod
     def prompt_init():
@@ -376,4 +409,6 @@ class Agent:
         self.property_list.append(PropertyClass())
 
 agent = Agent()
-agent.find_property()
+agent.add_property()
+agent.add_property()
+agent.display_properties()
