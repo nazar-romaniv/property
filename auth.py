@@ -12,7 +12,7 @@ class User:
         password = password.encode('utf-8')
         return hashlib.sha256(password).hexdigest()
 
-    def verify_passwd(self, to_verify):
+    def verify_password(self, to_verify):
         to_verify = hashlib.sha256(to_verify).hexdigest()
         return to_verify == self.password
 
@@ -34,7 +34,7 @@ class Authenticator:
             user = self.users[username]
             if user.logged_in:
                 raise AlreadyLoggedIn
-            if not user.verify_passwd(password):
+            if not user.verify_password(password):
                 raise InvalidPassword
             user.logged_in = True
             return True
@@ -48,6 +48,17 @@ class Authenticator:
             return False
         except KeyError:
             return False
+
+    def del_user(self, username):
+        try:
+            del self.users[username]
+        except KeyError:
+            raise DoesNotExist
+
+    def list_users(self):
+        for user in self.users:
+            print(user)
+        print()
 
 
 class Authorizer:
@@ -69,6 +80,14 @@ class Authorizer:
         else:
             permission.add(user)
 
+    def withdraw_permission(self, perm_name, username):
+        try:
+            user = authenticator.users[username]
+            permission = self.permissions[perm_name]
+            permission.remove(user)
+        except KeyError:
+            raise DoesNotExist
+
     def verify_permission(self, perm_name, username):
         try:
             user = authenticator.users[username]
@@ -89,10 +108,6 @@ class Authorizer:
             if user in self.permissions[permission]:
                 perm_list.append(permission)
         return perm_list
-
-
-authenticator = Authenticator()
-authorizer = Authorizer()
 
 
 class InvalidPassword(Exception):
@@ -117,3 +132,13 @@ class AlreadyLoggedIn(Exception):
 
 class PermissionDenied(Exception):
     pass
+
+
+authenticator = Authenticator()
+authorizer = Authorizer()
+authorizer.add_permission('add a new entry')
+authorizer.add_permission('delete entries')
+authorizer.add_permission('view information about properties for rental')
+authorizer.add_permission('view information about properties for sale')
+authorizer.add_permission('add and delete users')
+authorizer.add_permission('manage permissions')
