@@ -7,15 +7,16 @@ class ApplicationSession:
         self.user = None
         self.authenticator = auth.authenticator
         self.authorizer = auth.authorizer
-        self.agents = agents
         print('Welcome!')
         while len(self.authenticator.users.keys()) == 0:
             print('Create a new user profile')
             self.add_user(None)
         self.log_in()
+        self.main_menu()
 
     def log_in(self):
         while self.user is None:
+            print('(Press Ctrl+C to exit)')
             username = input('Enter username: ')
             password = input('Enter password: ')
             try:
@@ -26,9 +27,11 @@ class ApplicationSession:
                 print('Wrong password!')
             except auth.AlreadyLoggedIn:
                 print('You are already logged in!')
+            except KeyboardInterrupt:
+                raise SystemExit
             else:
                 print('Welcome, {}!'.format(username))
-                self.user = self.authenticator.users[username]
+                self.user = username
 
     def add_user(self, username):
         while True:
@@ -137,3 +140,54 @@ class ApplicationSession:
                     self.authenticator[username].display_properties()
         except auth.PermissionDenied:
             print('You do not have the right to view property entries!')
+
+    def add_property(self, username):
+        try:
+            if self.authorizer.verify_permission('add a new entry', username):
+                self.authenticator.users[username].add_property()
+        except auth.PermissionDenied:
+            print('You do not have the permission to add new entries!')
+
+    def remove_property(self, username):
+        try:
+            if self.authorizer.verify_permission('delete entries', username):
+                self.authenticator.users[username].remove_property()
+        except auth.PermissionDenied:
+            print('You do not have the permission to remove entries!')
+
+    def log_out(self, username):
+        print('Goodbye, {}!'.format(username))
+        self.log_in()
+
+    def quit(self, username):
+        print('Goodbye, {}!'.format(username))
+        raise SystemExit
+
+
+    def main_menu(self):
+        actions = {
+            '0': ApplicationSession.view_info,
+            '1': ApplicationSession.add_property,
+            '2': ApplicationSession.remove_property,
+            '3': ApplicationSession.add_user,
+            '4': ApplicationSession.delete_user,
+            '5': ApplicationSession.manage_permissions,
+            '6': ApplicationSession.log_out,
+            '7': ApplicationSession.quit
+        }
+        while True:
+            print(
+            '''0 - view information on properties
+            1 - add a property
+            2 - remove a property
+            3 - add a new user account
+            4 - remove a user
+            5 - manage permissions
+            6 - log out
+            7 - quit
+            ''')
+            option = ''
+            options = tuple((str(i) for i in range(8)))
+            while option not in options:
+                option = input()
+            actions[option](self, self.user)
