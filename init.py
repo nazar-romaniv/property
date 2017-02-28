@@ -1,4 +1,6 @@
 from auth_account import ApplicationSession
 
-session = ApplicationSession()
-del session
+try:
+    _ = ApplicationSession()
+except SystemExit:
+    quit()
