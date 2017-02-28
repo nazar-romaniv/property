@@ -359,3 +359,14 @@ class Agent:
         PropertyClass = self.type_map[(property_type, payment_type)]
         init_args = PropertyClass.prompt_init()
         self.property_list.append(PropertyClass(**init_args))
+
+    def remove_property(self):
+        for property in enumerate(self.property_list):
+            print(property[0])
+            property[1].display()
+        print('Enter the number of property to remove: ')
+        try:
+            num = int(input())
+            self.property_list.pop(num)
+        except ValueError:
+            print('Invalid number!')

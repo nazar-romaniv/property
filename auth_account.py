@@ -8,14 +8,6 @@ class ApplicationSession:
         self.user = None
         self.authenticator = auth.authenticator
         self.authorizer = auth.authorizer
-        self.actions = {
-            'find property': Agent.add_property,
-            'display properties': Agent.display_properties,
-            'add a property': Agent.add_property,
-            'add a user':  auth.Authenticator.add_user,
-            'delete a user': auth.Authenticator.del_user,
-            'manage permissions': auth.Authorizer.give_permission
-        }
         print('Welcome!')
         while len(self.authenticator.users.keys()) == 0:
             print('Create a new user profile')
@@ -41,7 +33,7 @@ class ApplicationSession:
     def add_user(self, username):
         while True:
             try:
-                if self.authorizer.verify_permission('add a user', username):
+                if self.authorizer.verify_permission('add and delete users', username):
                     new_username = input('Enter a new username: ')
                     password = input('Enter the new user\'s password: ')
                     self.authenticator.add_user(new_username, password)
@@ -67,20 +59,64 @@ class ApplicationSession:
     def manage_permissions(self, username):
         while True:
             try:
-                if self.authorizer.verify_permission('manage permissions', username)
+                if self.authorizer.verify_permission('manage permissions', username):
                     actions = {
-                        'add a permission': auth.Authorizer.add_permission,
-                        'withdraw a permission': auth.Authorizer.withdraw_permission,
-                        'list permissions': auth.Authorizer.list_permissions,
-                        'give permission': auth.Authorizer.give_permission
+                        '0': auth.Authorizer.add_permission,
+                        '1': auth.Authorizer.withdraw_permission,
+                        '2': auth.Authorizer.give_permission,
+                        '3': auth.Authorizer.print_permissions
                     }
                     while True:
-                        print('Enter the user whose permissions you want to edit: ')
-                        self.authenticator.list_users()
-                        user_to_edit = ''
-                        while user_to_edit not in self.authenticator.users.keys():
-                            username = input()
-
+                        try:
+                            print('Enter the user whose permissions you want to edit/view: (Press Ctrl+C to exit) ')
+                            self.authenticator.list_users()
+                            user_to_edit = ''
+                            while user_to_edit not in self.authenticator.users.keys():
+                                user_to_edit = input()
+                            print('The permissions of {}'.format(user_to_edit),
+                                  self.authorizer.list_permissions(user_to_edit))
+                            print(
+                                '''0 - add a permission
+                                1 - withdraw a permission
+                                2 - grant a permission
+                                3 - print all available permissions'''
+                            )
+                            action = None
+                            options = ('0', '1', '2', '3')
+                            while action not in options:
+                                action = input()
+                            if action != '3':
+                                print('Enter the permission name: ')
+                                perm_name = ''
+                                while perm_name not in self.authorizer.permissions.keys():
+                                    perm_name = input()
+                                if action == '0':
+                                    actions[action](self.authorizer.actions, perm_name)
+                                else:
+                                    actions[action](self.authorizer.actions, perm_name, user_to_edit)
+                            else:
+                                self.authorizer.print_permissions()
+                        except KeyboardInterrupt:
+                            break
+                        except Exception:
+                            raise
             except auth.PermissionDenied:
                 print('You are not allowed to manage permissions!')
                 break
+            except auth.DoesNotExist:
+                print('Permission does not exist!')
+            except auth.AlreadyExists:
+                print('Permission already exists!')
+
+    def delete_user(self, username):
+        try:
+            while True:
+                if self.authorizer.verify_permission('add and delete users', username):
+                    print('Enter the name of the user to delete: ')
+                    self.authenticator.list_users()
+                    user_to_delete = input()
+                    self.authenticator.del_user(user_to_delete)
+        except auth.PermissionDenied:
+            print('You do not have the permission to add and delete users!')
+        except auth.DoesNotExist:
+            print('The user does not exist!')

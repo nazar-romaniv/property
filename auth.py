@@ -109,6 +109,10 @@ class Authorizer:
                 perm_list.append(permission)
         return perm_list
 
+    def print_permissions(self):
+        for permission in self.permissions:
+            print(permission)
+
 
 class InvalidPassword(Exception):
     pass
@@ -138,7 +142,6 @@ authenticator = Authenticator()
 authorizer = Authorizer()
 authorizer.add_permission('add a new entry')
 authorizer.add_permission('delete entries')
-authorizer.add_permission('view information about properties for rental')
-authorizer.add_permission('view information about properties for sale')
+authorizer.add_permission('view information about properties')
 authorizer.add_permission('add and delete users')
 authorizer.add_permission('manage permissions')
