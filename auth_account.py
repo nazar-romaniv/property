@@ -36,7 +36,16 @@ class ApplicationSession:
     def add_user(self, username):
         while True:
             try:
-                if self.authorizer.verify_permission('add and delete users', username):
+                if username is None:
+                    try:
+                        new_username = input('Enter a new username: ')
+                        password = input('Enter the new user\'s password: ')
+                        self.authenticator.add_user(new_username, password)
+                        for permission in self.authorizer.permissions:
+                            self.authorizer.give_permission(permission, new_username)
+                    except KeyboardInterrupt:
+                        raise SystemExit
+                elif self.authorizer.verify_permission('add and delete users', username):
                     new_username = input('Enter a new username: ')
                     password = input('Enter the new user\'s password: ')
                     self.authenticator.add_user(new_username, password)
@@ -46,15 +55,11 @@ class ApplicationSession:
                 print('Password is too short!')
             except auth.PermissionDenied:
                 print('You do not have the permission to add user entries!')
-                raise
-            except auth.DoesNotExist:          #this will be the case for the creation of the very first user account
-                new_username = input('Enter a new username')
-                password = input('Enter the new user\'s password')
-                self.authenticator.add_user(new_username, password)
-                for permission in self.authorizer.permissions:
-                    self.authorizer.give_permission(permission, new_username)
+                break
             except KeyboardInterrupt:
                 break
+            except:
+                print('exception')
             else:
                 break
             print('Press Ctrl+C to exit')
@@ -79,10 +84,12 @@ class ApplicationSession:
                             print('The permissions of {}'.format(user_to_edit),
                                   self.authorizer.list_permissions(user_to_edit))
                             print(
-                                '''0 - add a permission
+                                '''
+                                0 - add a permission
                                 1 - withdraw a permission
                                 2 - grant a permission
-                                3 - print all available permissions'''
+                                3 - print all available permissions
+                                '''
                             )
                             action = None
                             options = ('0', '1', '2', '3')
@@ -94,15 +101,13 @@ class ApplicationSession:
                                 while perm_name not in self.authorizer.permissions.keys():
                                     perm_name = input()
                                 if action == '0':
-                                    actions[action](self.authorizer.actions, perm_name)
+                                    actions[action](self.authorizer, perm_name)
                                 else:
-                                    actions[action](self.authorizer.actions, perm_name, user_to_edit)
+                                    actions[action](self.authorizer, perm_name, user_to_edit)
                             else:
                                 self.authorizer.print_permissions()
                         except KeyboardInterrupt:
                             break
-                        except Exception:
-                            raise
             except auth.PermissionDenied:
                 print('You are not allowed to manage permissions!')
                 break
@@ -128,16 +133,17 @@ class ApplicationSession:
         try:
             if self.authorizer.verify_permission('view information about properties', username):
                 print(
-                '''0 - find a property
+                '''
+                0 - find a property
                 1 - list all properties
                 ''')
                 option = ''
                 while option not in ('0', '1'):
                     option = input()
                 if option == '0':
-                    self.authenticator[username].find_property()
+                    self.authenticator.users[username].find_property()
                 elif option == '1':
-                    self.authenticator[username].display_properties()
+                    self.authenticator.users[username].display_properties()
         except auth.PermissionDenied:
             print('You do not have the right to view property entries!')
 
@@ -163,7 +169,6 @@ class ApplicationSession:
         print('Goodbye, {}!'.format(username))
         raise SystemExit
 
-
     def main_menu(self):
         actions = {
             '0': ApplicationSession.view_info,
@@ -177,7 +182,8 @@ class ApplicationSession:
         }
         while True:
             print(
-            '''0 - view information on properties
+            '''
+            0 - view information on properties
             1 - add a property
             2 - remove a property
             3 - add a new user account

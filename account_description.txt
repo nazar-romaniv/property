@@ -1,5 +1,4 @@
 add a new entry
 delete entries
-view information about properties for rental
-view information about properties for sale
+view information about properties
 add and delete users

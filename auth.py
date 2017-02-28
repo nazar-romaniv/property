@@ -15,6 +15,7 @@ class User(Agent):
         return hashlib.sha256(password).hexdigest()
 
     def verify_password(self, to_verify):
+        to_verify = to_verify.encode('utf-8')
         to_verify = hashlib.sha256(to_verify).hexdigest()
         return to_verify == self.password
 
@@ -63,10 +64,14 @@ class Authenticator:
         print()
 
 
+authenticator = Authenticator()
+
+
 class Authorizer:
 
     def __init__(self):
         self.permissions = {}
+        self.authenticator = authenticator
 
     def add_permission(self, perm_name):
         if perm_name in self.permissions:
@@ -75,7 +80,7 @@ class Authorizer:
 
     def give_permission(self, perm_name, username):
         try:
-            user = authenticator.users[username]
+            user = self.authenticator.users[username]
             permission = self.permissions[perm_name]
         except KeyError:
             raise DoesNotExist
@@ -84,7 +89,7 @@ class Authorizer:
 
     def withdraw_permission(self, perm_name, username):
         try:
-            user = authenticator.users[username]
+            user = self.authenticator.users[username]
             permission = self.permissions[perm_name]
             permission.remove(user)
         except KeyError:
@@ -92,9 +97,9 @@ class Authorizer:
 
     def verify_permission(self, perm_name, username):
         try:
-            user = authenticator.users[username]
+            user = self.authenticator.users[username]
             if user in self.permissions[perm_name]:
-                pass
+                return True
             else:
                 raise PermissionDenied
         except KeyError:
@@ -102,7 +107,7 @@ class Authorizer:
 
     def list_permissions(self, username):
         try:
-            user = authenticator.users[username]
+            user = self.authenticator.users[username]
         except KeyError:
             raise DoesNotExist
         perm_list = []
@@ -140,7 +145,6 @@ class PermissionDenied(Exception):
     pass
 
 
-authenticator = Authenticator()
 authorizer = Authorizer()
 authorizer.add_permission('add a new entry')
 authorizer.add_permission('delete entries')
