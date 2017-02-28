@@ -1,5 +1,4 @@
 import auth
-from main import Agent
 
 
 class ApplicationSession:
@@ -8,6 +7,7 @@ class ApplicationSession:
         self.user = None
         self.authenticator = auth.authenticator
         self.authorizer = auth.authorizer
+        self.agents = agents
         print('Welcome!')
         while len(self.authenticator.users.keys()) == 0:
             print('Create a new user profile')
@@ -120,3 +120,20 @@ class ApplicationSession:
             print('You do not have the permission to add and delete users!')
         except auth.DoesNotExist:
             print('The user does not exist!')
+
+    def view_info(self, username):
+        try:
+            if self.authorizer.verify_permission('view information about properties', username):
+                print(
+                '''0 - find a property
+                1 - list all properties
+                ''')
+                option = ''
+                while option not in ('0', '1'):
+                    option = input()
+                if option == '0':
+                    self.authenticator[username].find_property()
+                elif option == '1':
+                    self.authenticator[username].display_properties()
+        except auth.PermissionDenied:
+            print('You do not have the right to view property entries!')

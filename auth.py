@@ -1,8 +1,10 @@
 import hashlib
+from main import Agent
 
-class User:
+class User(Agent):
 
     def __init__(self, username, password):
+        super().__init__()
         self.username = username
         self.password = User.__encrypt(password)
         self.logged_in = False
